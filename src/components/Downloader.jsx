@@ -1,6 +1,20 @@
 import { useState } from 'react'
 
-const BACKEND_URL = import.meta.env.VITE_BACKEND_URL || ''
+function resolveBackendURL() {
+  const env = import.meta.env.VITE_BACKEND_URL
+  if (env && typeof env === 'string' && env.trim().length > 0) return env.trim()
+  if (typeof window !== 'undefined') {
+    const origin = window.location.origin
+    // Try common dev/preview patterns
+    let candidate = origin
+      .replace('-3000.', '-8000.')
+      .replace(':3000', ':8000')
+    return candidate
+  }
+  return 'http://localhost:8000'
+}
+
+const BACKEND_URL = resolveBackendURL()
 
 export default function Downloader() {
   const [url, setUrl] = useState('')
@@ -74,6 +88,8 @@ export default function Downloader() {
           </div>
         </div>
       )}
+
+      <p className="text-xs text-blue-300/60 mt-4">Serveur API détecté: <span className="font-mono">{BACKEND_URL}</span></p>
     </div>
   )
 }
